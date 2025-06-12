@@ -1,0 +1,15 @@
+# Example configuration file for Shortcut CLI
+# Copy this file to ~/.config/shortcut/config.yml and update with your values
+
+auth:
+  token: your-shortcut-api-token-here
+
+# Future configuration options (not yet implemented):
+# defaults:
+#   project: API
+#   group: Backend
+#   workflow: Engineering
+# 
+# output:
+#   format: table
+#   fields: [id, name, type, state, owner]

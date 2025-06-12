@@ -1,20 +1,12 @@
 import click
-import os
 from datetime import datetime
-from useshortcut.client import APIClient
 from rich.console import Console
 from rich.table import Table
+from sc.utils import get_client
 
 console = Console()
 
 
-def get_client():
-    """Get Shortcut client with API token from environment."""
-    token = os.environ.get('SHORTCUT_API_TOKEN')
-    if not token:
-        console.print("[red]Error: SHORTCUT_API_TOKEN environment variable not set[/red]")
-        raise click.Abort()
-    return APIClient(api_token=token)
 
 
 @click.group()
