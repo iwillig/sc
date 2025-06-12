@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 click = "*"
+useshortcut = "0.0.4"
+rich = "*"
 
 [dev-packages]
 
