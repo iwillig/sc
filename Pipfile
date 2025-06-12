@@ -5,8 +5,14 @@ name = "pypi"
 
 [packages]
 click = "*"
+useshortcut = "0.0.4"
+rich = "*"
+pyyaml = "*"
+questionary = "*"
 
 [dev-packages]
+pytest = "*"
+pytest-mock = "*"
 
 [requires]
 python_version = "3.13"
