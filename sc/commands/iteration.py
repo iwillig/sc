@@ -20,12 +20,7 @@ def iteration():
 def list(include_archived):
     """List all iterations."""
     client = get_client()
-    try:
-        iterations = client.list_iterations()
-    except Exception as e:
-        console.print(f"[red]Error listing iterations: {str(e)}[/red]")
-        return
-    
+    iterations = client.list_iterations()
     # Note: API doesn't provide archived flag for iterations
     # Filter by status instead - 'done' iterations are effectively archived
     if not include_archived:

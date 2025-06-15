@@ -3,6 +3,7 @@ from rich.console import Console
 from rich.table import Table
 from sc.utils import get_client
 
+from useshortcut.models import SearchInputs
 console = Console()
 
 
@@ -40,13 +41,7 @@ def list():
 def view(group_id):
     """View details of a specific team."""
     client = get_client()
-    try:
-        g = client.get_group(group_id)
-    except Exception as e:
-        console.print(f"[red]Error: Could not find team with ID '{group_id}'[/red]")
-        console.print(f"[dim]Details: {str(e)}[/dim]")
-        return
-    
+    g = client.get_group(group_id)
     console.print(f"\n[bold]Team: {g.name}[/bold]")
     console.print(f"ID: [cyan]{g.id}[/cyan]")
     console.print(f"Description: {g.description or 'No description'}")
@@ -57,18 +52,12 @@ def view(group_id):
 
 
 @team.command()
-@click.argument('group_id')
-def members(group_id):
+@click.argument('team_id')
+def members(team_id):
     """List members of a team."""
     client = get_client()
-    try:
-        g = client.get_group(group_id)
-        members = client.list_members()
-    except Exception as e:
-        console.print(f"[red]Error: Could not find team with ID '{group_id}'[/red]")
-        console.print(f"[dim]Details: {str(e)}[/dim]")
-        return
-    
+    g = client.get_group(team_id)
+    api_members = client.list_members()
     console.print(f"\n[bold]Members of {g.name}:[/bold]")
     
     table = Table()
@@ -77,9 +66,9 @@ def members(group_id):
     table.add_column("Email")
     table.add_column("Role")
     
-    group_members = [m for m in members if m.id in g.member_ids]
+    team_members = [m for m in api_members if m.id in g.member_ids]
     
-    for member in group_members:
+    for member in team_members:
         table.add_row(
             member.id,
             member.profile.name,
@@ -91,48 +80,21 @@ def members(group_id):
 
 
 @team.command()
-@click.argument('group_id')
+@click.argument('team_id')
 @click.option('--limit', '-l', default=20, help='Limit number of stories')
 @click.option('--state', '-s', help='Filter by workflow state')
-def stories(group_id, limit, state):
+def stories(team_id, limit, state):
     """List stories assigned to a team."""
     client = get_client()
-    try:
-        g = client.get_group(group_id)
-    except Exception as e:
-        console.print(f"[red]Error: Could not find team with ID '{group_id}'[/red]")
-        console.print(f"[dim]Details: {str(e)}[/dim]")
-        return
-    
-    from useshortcut.models import SearchInputs
-    
-    query = f"group:{group_id}"
+    g = client.get_group(team_id)
+    query = f"group:{team_id}"
+
     if state:
         query += f" state:{state}"
-    
-    try:
-        search_params = SearchInputs(query=query, page_size=limit)
-        try:
-            search_results = client.search_stories(search_params)
-            stories = search_results.data if hasattr(search_results, 'data') else search_results
-            stories = stories[:limit] if isinstance(stories, list) else []
-        except TypeError as e:
-            # Fallback: use raw API if model parsing fails
-            import requests
-            headers = {'Shortcut-Token': client.api_token}
-            response = requests.get(f"{client.base_url}/search/stories", headers=headers, params={'query': query, 'page_size': limit})
-            if response.status_code == 200:
-                data = response.json()
-                stories = data.get('data', [])
-                # Convert raw dicts to objects with necessary attributes
-                from types import SimpleNamespace
-                stories = [SimpleNamespace(**s) for s in stories[:limit]]
-            else:
-                raise
-    except Exception as e:
-        console.print(f"[red]Error searching stories: {str(e)}[/red]")
-        return
-    
+
+    search_params = SearchInputs(query=query, page_size=limit)
+    search_results = client.search_stories(search_params)
+    stories = search_results.data
     console.print(f"\n[bold]Stories for {g.name}:[/bold]")
     
     table = Table()
