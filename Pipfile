@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 click = "*"
-useshortcut = "0.0.4"
+useshortcut = "0.0.6"
 rich = "*"
 pyyaml = "*"
 questionary = "*"

@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import Mock, MagicMock
 from click.testing import CliRunner
 from sc.commands.story import story
-from useshortcut.models import StoryInput, UpdateStoryInput
+from useshortcut.models import StoryCreateParams, UpdateStoryCreateParams
 
 
 def test_story_create_success(mocker):
